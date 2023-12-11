@@ -5,29 +5,34 @@ import {
     completeMissingCategoriesWithGpt,
     fetchCategories,
     fetchTransactions,
-    fetchTransactionsWithoutCategory,
     signInUser,
 } from './services/spendee';
 
 export async function completeMissingCategories() {
     const me = await signInUser();
 
-    let transactionsWithoutCategory = await fetchTransactionsWithoutCategory(me.uid);
+    const categoriesById = await fetchCategories(me.uid);
+
+    logger.log('categoriesById:', { categoriesById });
+
+    const transactions = await fetchTransactions(me.uid, me.walletId);
+
+    const transactionsWithCategory = transactions.filter(t => t.category && categoriesById.has(t.category));
+    let transactionsWithoutCategory = transactions.filter(t => !t.category || !categoriesById.has(t.category));
 
     if (transactionsWithoutCategory.length === 0) {
         logger.log('All transactions have set category.');
         return;
     }
 
-    logger.log('transactionsWithoutCategory:', transactionsWithoutCategory);
-
-    const [allTransactions, categoriesById] = await Promise.all([fetchTransactions(me.uid), fetchCategories(me.uid)]);
-
-    logger.log('allTransactions and categoriesById:', { allTransactions, categoriesById });
+    logger.log('transactions:', {
+        withCategory: transactionsWithCategory.length,
+        withoutCategory: transactionsWithoutCategory.length,
+    });
 
     // try to fill-in missing categories based on transaction note from other transactions with the same note
     transactionsWithoutCategory = await completeMissingCategoriesBasedOnSimilarTransactions(me, {
-        transactionsWithCategory: allTransactions.filter(t => t.category !== null),
+        transactionsWithCategory,
         transactionsWithoutCategory,
         categoriesById,
     });

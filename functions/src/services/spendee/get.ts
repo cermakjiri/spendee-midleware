@@ -28,7 +28,7 @@ export async function fetchCategories(meUid: string) {
 
 const isReqularTransaction = (t: Transaction) => t.type === 'regular';
 
-export async function fetchTransactions(meUid: string, count?: number) {
+export async function fetchTransactions(meUid: string, walletId: string, count?: number) {
     const constraints: QueryConstraint[] = [where('path.user', '==', meUid), orderBy('__name__', 'asc')];
 
     if (Number.isInteger(count)) {
@@ -39,18 +39,13 @@ export async function fetchTransactions(meUid: string, count?: number) {
 
     const transactions = (await getDocs(transactionsQuery)).docs.map(doc => doc.data()) as Transaction[];
 
-    return transactions.filter(isReqularTransaction);
+    return transactions.filter(isReqularTransaction).filter(t => t.path.wallet === walletId);
 }
 
-export async function fetchTransactionsWithoutCategory(meUid: string): Promise<Transaction[]> {
-    const transactionsQuery = query(
-        collectionGroup(db, CollectionId.Transactions),
-        where('path.user', '==', meUid),
-        where('category', '==', null),
-        orderBy('__name__', 'asc'),
+export async function fetchWallets(meUid: string) {
+    const wallets = (await getDocs(collection(db, CollectionId.Users, meUid, CollectionId.Wallets))).docs.map(doc =>
+        doc.data(),
     );
 
-    const transactions = (await getDocs(transactionsQuery)).docs.map(doc => doc.data()) as Transaction[];
-
-    return transactions;
+    return wallets;
 }
