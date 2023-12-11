@@ -1,6 +1,7 @@
 import { logger } from 'firebase-functions';
 import { doc, serverTimestamp, writeBatch } from 'firebase/firestore';
 
+import { config } from '../../config';
 import { Me } from './auth';
 import { db } from './config/firebase';
 import { CollectionId, Transaction } from './types';
@@ -41,7 +42,9 @@ export async function updateTransactionsCategory(me: Me, transactions: Transacti
 
         logger.log(`(${batchCount / totalBatchCount}): Updating ${batchPayload.length} items...`, batchPayload);
 
-        await batch.commit();
+        if (!config.dryRun) {
+            await batch.commit();
+        }
 
         logger.log(`(${batchCount / totalBatchCount}): ${batchPayload.length} items updated.`);
 
