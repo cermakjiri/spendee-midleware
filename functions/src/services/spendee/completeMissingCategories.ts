@@ -67,7 +67,7 @@ export async function completeMissingCategoriesBasedOnSimilarTransactions(
         return acc;
     }, byNoteInitial);
 
-    logger.log('index created:', { byNote });
+    logger.log('index created:', Object.fromEntries(byNote.entries()));
 
     // Try to find a category for each transaction without a category based on note similarity
     const transactions = transactionsWithoutCategory.map(t => {

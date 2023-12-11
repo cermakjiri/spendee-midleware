@@ -13,7 +13,7 @@ export async function completeMissingCategories() {
 
     const categoriesById = await fetchCategories(me.uid);
 
-    logger.log('categoriesById:', { categoriesById });
+    logger.log('categoriesById:', Object.fromEntries(categoriesById.entries()));
 
     const transactions = await fetchTransactions(me.uid, me.walletId);
 
@@ -42,7 +42,7 @@ export async function completeMissingCategories() {
         return;
     }
 
-    logger.log('Useing GPT API to detect correct category:', {
+    logger.log('Using GPT API to detect correct category:', {
         count: transactionsWithoutCategory.length,
         transactions: transactionsWithoutCategory,
     });

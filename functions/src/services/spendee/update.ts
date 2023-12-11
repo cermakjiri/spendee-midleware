@@ -12,7 +12,12 @@ export async function updateTransactionsCategory(me: Me, transactions: Transacti
     let batchCount = 1;
     const totalBatchCount = Math.ceil(transactions.length / batchSize);
 
-    logger.log(`Updating transactions by ${batchSize} items at once. Total items to update:`, transactions);
+    logger.log(
+        `Updating transactions: UP to ${batchSize} items at once in ${totalBatchCount} batch/es. TOTAL items to update:`,
+        transactions.length,
+    );
+
+    logger.log('Updating transactions:', transactions);
 
     while (transactions.length > 0) {
         const batchPayload = transactions.splice(0, batchSize);
