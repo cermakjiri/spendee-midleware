@@ -118,7 +118,7 @@ export async function completeMissingCategoriesBasedOnSimilarTransactions(
     });
 
     // Save the updated transactions with categories to the database
-    const transactionsWithCategories = transactions.filter(t => t.category !== null);
+    const transactionsWithCategories = transactions.filter(t => t.category);
     logger.log('transactionsWithCategories:', { transactionsWithCategories });
     await updateTransactionsCategory(me, transactionsWithCategories);
 
@@ -152,9 +152,9 @@ export async function completeMissingCategoriesWithGpt(
         category: completedCategoryIds[i],
     }));
 
-    const transactionsWithCategories = transactions.filter(t => t.category !== null);
+    const transactionsWithCategories = transactions.filter(t => t.category);
 
     await updateTransactionsCategory(me, transactionsWithCategories);
 
-    return transactions.filter(t => t.category === null);
+    return transactionsWithCategories;
 }
