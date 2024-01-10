@@ -2,11 +2,11 @@ import { logger } from 'firebase-functions';
 import { doc, serverTimestamp, writeBatch } from 'firebase/firestore';
 
 import { config } from '../../config';
-import { Me } from './auth';
+import { UserWithWallet } from '../../types';
 import { db } from './config/firebase';
 import { CollectionId, Transaction } from './types';
 
-export async function updateTransactionsCategory(me: Me, transactions: Transaction[]) {
+export async function updateTransactionsCategory({ uid, walletId }: UserWithWallet, transactions: Transaction[]) {
     const batch = writeBatch(db);
     const batchSize = 50;
     let batchCount = 1;
@@ -26,9 +26,9 @@ export async function updateTransactionsCategory(me: Me, transactions: Transacti
             const transactionRef = doc(
                 db,
                 CollectionId.Users,
-                me.uid,
+                uid,
                 CollectionId.Wallets,
-                me.walletId,
+                walletId,
                 CollectionId.Transactions,
                 transaction.path.transaction,
             );

@@ -7,14 +7,10 @@ import {
     fetchTransactions,
     signInUser,
 } from './services/spendee';
+import { Category } from './services/spendee/types';
+import { UserWithWallet } from './types';
 
-export async function completeMissingCategories() {
-    const me = await signInUser();
-
-    const categoriesById = await fetchCategories(me.uid);
-
-    logger.log('categoriesById:', Object.fromEntries(categoriesById.entries()));
-
+async function completeCategoriesInWallet(me: UserWithWallet, categoriesById: Map<string, Category>) {
     const transactions = await fetchTransactions(me.uid, me.walletId);
 
     const transactionsWithCategory = transactions.filter(t => t.category && categoriesById.has(t.category));
@@ -67,4 +63,24 @@ export async function completeMissingCategories() {
             amount: t.amount,
         })),
     );
+}
+
+export async function completeMissingCategories() {
+    const me = await signInUser();
+
+    const categoriesById = await fetchCategories(me.uid);
+
+    logger.log('categoriesById:', Object.fromEntries(categoriesById.entries()));
+
+    for (const walletId of me.walletIds) {
+        logger.log('walletId started:', walletId);
+        await completeCategoriesInWallet(
+            {
+                uid: me.uid,
+                walletId,
+            },
+            categoriesById,
+        );
+        logger.log('walletId completed:', walletId);
+    }
 }

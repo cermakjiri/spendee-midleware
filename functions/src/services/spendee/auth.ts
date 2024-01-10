@@ -20,8 +20,6 @@ export async function signInUser() {
 
     return {
         uid: meUid,
-        walletId: me.visibleWallets[0],
+        walletIds: me.visibleWallets,
     } as const;
 }
-
-export type Me = Awaited<ReturnType<typeof signInUser>>;

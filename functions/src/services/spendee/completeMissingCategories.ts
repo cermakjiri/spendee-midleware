@@ -1,8 +1,8 @@
 import { logger } from 'firebase-functions';
 import Levenshtein from 'levenshtein';
 
+import { UserWithWallet } from '../../types';
 import { categorizeExpenses } from '../gpt';
-import type { Me } from './auth';
 import { Category, Transaction } from './types';
 import { updateTransactionsCategory } from './update';
 
@@ -44,7 +44,7 @@ export interface CompleteMissingCategoriesProps {
 }
 
 export async function completeMissingCategoriesBasedOnSimilarTransactions(
-    me: Me,
+    me: UserWithWallet,
     { transactionsWithCategory, transactionsWithoutCategory, categoriesById }: CompleteMissingCategoriesProps,
 ): Promise<Transaction[]> {
     const byNoteInitial = new Map<Transaction['note'], CategoryIndex>();
@@ -131,7 +131,7 @@ export interface CompleteMissingCategoriesWithGptProps {
 }
 
 export async function completeMissingCategoriesWithGpt(
-    me: Me,
+    me: UserWithWallet,
     { transactionsWithoutCategory, categoriesById }: CompleteMissingCategoriesWithGptProps,
 ) {
     const categories = Array.from(categoriesById.entries()).map(([id, category]) => [id, category.name]);
