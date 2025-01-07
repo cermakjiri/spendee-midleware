@@ -24,7 +24,7 @@ export async function categorizeExpenses(categories: string[], expenseNotes: str
 
     const chatCompletion = await openai.chat.completions.create({
         messages: [{ role: 'user', content: createPrompt(categories, expenseNotes) }],
-        model: 'gpt-4',
+        model: 'gpt-4o',
     });
 
     const result = chatCompletion.choices[0].message.content;
