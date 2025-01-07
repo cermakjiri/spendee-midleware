@@ -7,7 +7,6 @@ import { db } from './config/firebase';
 import { CollectionId, Transaction } from './types';
 
 export async function updateTransactionsCategory({ uid, walletId }: UserWithWallet, transactions: Transaction[]) {
-    const batch = writeBatch(db);
     const batchSize = 50;
     let batchCount = 1;
     const totalBatchCount = Math.ceil(transactions.length / batchSize);
@@ -20,6 +19,8 @@ export async function updateTransactionsCategory({ uid, walletId }: UserWithWall
     logger.log('Updating transactions:', transactions);
 
     while (transactions.length > 0) {
+        const batch = writeBatch(db);
+
         const batchPayload = transactions.splice(0, batchSize);
 
         batchPayload.forEach(transaction => {
